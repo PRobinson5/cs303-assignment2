@@ -19,10 +19,15 @@ void SingleLinkedList<Item_Type>::push_front(Item_Type data) {
 template <class Item_Type>
 void SingleLinkedList<Item_Type>::push_back(Item_Type data) {
 	Node<Item_Type>* newNode = new Node<Item_Type>(data);
-	tail->next = newNode;
-	tail = newNode;
-	if (head == nullptr)
+	if (empty()) {
+		tail = newNode;
 		head = newNode;
+	}
+	else {
+		Node<Item_Type>* newNode = new Node<Item_Type>(data);
+		tail->next = newNode;
+		tail = newNode;
+	}
 	num_items++;
 }
 
@@ -79,7 +84,7 @@ bool SingleLinkedList<Item_Type>::empty() {
 
 template <class Item_Type>
 void SingleLinkedList<Item_Type>::insert(size_t index, const Item_Type& item) {
-	if (empty()) {
+	if (empty() || index == 0) {
 		push_front(item);
 		return;
 	}
@@ -91,6 +96,8 @@ void SingleLinkedList<Item_Type>::insert(size_t index, const Item_Type& item) {
 	}
 	Node<Item_Type>* newNode = new Node<Item_Type>(item, foreNode->next);
 	foreNode->next = newNode;
+	tail = newNode;
+	foreNode = nullptr;
 	num_items++;
 }
 
@@ -104,12 +111,18 @@ bool SingleLinkedList<Item_Type>::remove(size_t index) {
 		i++;
 		foreNode = foreNode->next;
 	}
-	if (i != (index - 1))
+	if (i != (index - 1) && i != 0)
 		return false;
-	Node<Item_Type>* delNode = foreNode->next;
-	foreNode->next = foreNode->next->next;
-	delete delNode;
-	delNode = nullptr;
+	else if (i == 0) {
+		pop_front();
+		return true;
+	}
+	else {
+		Node<Item_Type>* delNode = foreNode->next;
+		foreNode->next = foreNode->next->next;
+		delete delNode;
+		delNode = nullptr;
+	}
 	foreNode = nullptr;
 	num_items--;
 	return true;
@@ -127,7 +140,7 @@ size_t SingleLinkedList<Item_Type>::find(const Item_Type& item) {
 	}
 	if (finder->data != item)
 		return (index + 1);
-	return index;
+	return (index);
 }
 
 template class SingleLinkedList<int>;
